@@ -33,10 +33,12 @@ class Employee(db.Model):
     state = db.Column(db.Text, nullable=False, default='CA')
     dept_code = db.Column(db.Text, db.ForeignKey('departments.dept_code'))
 
-    dept = db.relationship('Department', backref='employees')
+    dept = db.relationship('Department', backref='employee')
 
     def __repr__(self):
         return f"<Employee {self.name} {self.state} {self.dept_code}"
+
+    assignments = db.relationship('EmployeeProject', backref='employee')
 
 def get_directory():
     all_emps = Employee.query.all()
@@ -46,57 +48,58 @@ def get_directory():
             print(emp.name, emp.dept.dept_name, emp.dept.phone)
         else:
             print(emp.name, "-", "-")
-#     assignments = db.relationship('EmployeeProject', backref='employee')
+            
 
 #     projects = db.relationship(
 #         'Project', secondary="employees_projects", backref="employees")
 
 #     def __repr__(self):
 #         return f"<Employee {self.name} {self.state} {self.dept_code} >"
-# class Project(db.Model):
 
-#     __tablename__ = 'projects'
+class Project(db.Model):
 
-#     proj_code = db.Column(db.Text, primary_key=True)
-#     proj_name = db.Column(db.Text, nullable=False, unique=True)
+    __tablename__ = 'projects'
 
-#     assignments = db.relationship('EmployeeProject', backref="project")
+    proj_code = db.Column(db.Text, primary_key=True)
+    proj_name = db.Column(db.Text, nullable=False, unique=True)
 
-
-# class EmployeeProject(db.Model):
-
-#     __tablename__ = 'employees_projects'
-
-#     emp_id = db.Column(db.Integer, db.ForeignKey(
-#         'employees.id'), primary_key=True)
-
-#     proj_code = db.Column(db.Text, db.ForeignKey(
-#         'projects.proj_code'), primary_key=True)
-
-#     role = db.Column(db.Text)
+    assignments = db.relationship('EmployeeProject', backref="project")
 
 
+class EmployeeProject(db.Model):
+
+    __tablename__ = 'employees_projects'
+
+    emp_id = db.Column(db.Integer, db.ForeignKey(
+        'employees.id'), primary_key=True)
+
+    proj_code = db.Column(db.Text, db.ForeignKey(
+        'projects.proj_code'), primary_key=True)
+
+    role = db.Column(db.Text)
 
 
 
-# def get_directory_join():
-#     directory = db.session.query(
-#         Employee.name, Department.dept_name, Department.phone).join(Department).all()
-
-#     for name, dept, phone in directory:
-#         print(name, dept, phone)
 
 
-# def get_directory_join_class():
-#     directory = db.session.query(Employee, Department).join(Department).all()
+def get_directory_join():
+    directory = db.session.query(
+        Employee.name, Department.dept_name, Department.phone).join(Department).all()
 
-#     for emp, dept in directory:
-#         print(emp.name, dept.dept_name, dept.phone)
+    for name, dept, phone in directory:
+        print(name, dept, phone)
 
 
-# def get_directory_all_join():
-#     directory = db.session.query(
-#         Employee.name, Department.dept_name, Department.phone).outerjoin(Department).all()
+def get_directory_join_class():
+    directory = db.session.query(Employee, Department).join(Department).all()
 
-#     for name, dept, phone in directory:
-#         print(name, dept, phone)
+    for emp, dept in directory:
+        print(emp.name, dept.dept_name, dept.phone)
+
+
+def get_directory_all_join():
+    directory = db.session.query(
+        Employee.name, Department.dept_name, Department.phone).outerjoin(Department).all()
+
+    for name, dept, phone in directory:
+        print(name, dept, phone)
